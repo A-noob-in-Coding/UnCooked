@@ -6,8 +6,12 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 data "aws_iam_policy_document" "github_assume" {
   statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
+    # TagSession needed by aws-actions/configure-aws-credentials@v4
+    actions = [
+      "sts:AssumeRoleWithWebIdentity",
+      "sts:TagSession",
+    ]
+    effect = "Allow"
 
     principals {
       type        = "Federated"
@@ -20,13 +24,13 @@ data "aws_iam_policy_document" "github_assume" {
       values   = ["sts.amazonaws.com"]
     }
 
+    # GitHub now issues sub as repo:owner@id/name@id:ref:... (and older owner/name form).
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "${local.github_repo_sub}:ref:refs/heads/main",
-        "${local.github_repo_sub}:environment:production",
-        "${local.github_repo_sub}:pull_request",
+        "${local.github_repo_sub}:*",
+        "repo:${var.github_org}@*/${var.github_repo}@*:*",
       ]
     }
   }
