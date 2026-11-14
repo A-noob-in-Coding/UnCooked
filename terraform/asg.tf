@@ -17,12 +17,12 @@ resource "aws_launch_template" "app" {
     }
   }
 
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    set -eux
-    echo "role=app" > /etc/uncooked-role
-  EOF
-  )
+  user_data = base64encode(templatefile("${path.module}/templates/app-userdata.sh.tpl", {
+    aws_region   = var.aws_region
+    ecr_registry = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
+    data_host    = aws_instance.data.private_ip
+    compose_b64  = filebase64("${path.module}/../web/docker-compose.app.yml")
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -42,9 +42,9 @@ resource "aws_autoscaling_group" "app" {
   min_size                  = var.asg_min
   desired_capacity          = var.asg_desired
   max_size                  = var.asg_max
-  vpc_zone_identifier       = aws_subnet.public[*].id
+  vpc_zone_identifier       = aws_subnet.private[*].id
   health_check_type         = "ELB"
-  health_check_grace_period = 300
+  health_check_grace_period = 900
   target_group_arns         = [aws_lb_target_group.app.arn]
 
   launch_template {

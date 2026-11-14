@@ -43,3 +43,15 @@ variable "alarm_email" {
   default     = ""
   description = "SNS email for ALB alarms (empty = no subscription)"
 }
+
+variable "budget_email" {
+  type        = string
+  default     = ""
+  description = "Email for AWS monthly budget alerts (empty = skip budget)"
+}
+
+variable "budget_limit_usd" {
+  type        = number
+  default     = 50
+  description = "Monthly AWS budget limit in USD"
+}
