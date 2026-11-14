@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy IMAGE_TAG to InService ASG instances via SSM.
+# Rolling deploy: one InService ASG instance at a time via SSM.
 set -euo pipefail
 
 : "${IMAGE_TAG:?}"
@@ -23,7 +23,7 @@ if [[ -z "${INSTANCE_IDS// /}" ]]; then
   exit 1
 fi
 
-echo "Targets: $INSTANCE_IDS"
+echo "Targets (rolling): $INSTANCE_IDS"
 echo "$IMAGE_TAG" > /tmp/uncooked-new-tag
 
 PREV=$(aws ssm get-parameter --name "/uncooked/app/image_tag" --query Parameter.Value --output text 2>/dev/null || true)
@@ -38,7 +38,6 @@ else
   COMPOSE_B64=$(base64 < "$COMPOSE_FILE" | tr -d '\n')
 fi
 
-# Pull JWT on the runner (GHA role / local AWS), then ship into backend/.env on the box.
 JWT_PRIV=$(aws ssm get-parameter --name /uncooked/app/jwt_private_key --with-decryption --query Parameter.Value --output text --region "$AWS_REGION" 2>/dev/null || true)
 JWT_PUB=$(aws ssm get-parameter --name /uncooked/app/jwt_public_key --with-decryption --query Parameter.Value --output text --region "$AWS_REGION" 2>/dev/null || true)
 if [[ -z "$JWT_PRIV" || -z "$JWT_PUB" || "$JWT_PRIV" == "None" || "$JWT_PUB" == "None" ]]; then
@@ -52,7 +51,6 @@ mkdir -p /opt/uncooked/backend /opt/uncooked/agent
 cd /opt/uncooked
 printf '%s' '${COMPOSE_B64}' | base64 -d > docker-compose.app.yml
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-# Private IP of this EC2 (IMDSv2) - different per ASG box for the footer demo.
 TOKEN=\$(curl -fsS -X PUT 'http://169.254.169.254/latest/api/token' -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600' || true)
 SERVER_IP=\$(curl -fsS -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4 || hostname -I | awk '{print \$1}')
 printf '%s\n' \
@@ -71,20 +69,17 @@ docker compose -f docker-compose.app.yml --env-file .env up -d --pull always
 EOF
 )
 DEPLOY_B64=$(printf '%s' "$DEPLOY_SCRIPT" | if base64 --help 2>&1 | grep -q -- '-w'; then base64 -w0; else base64 | tr -d '\n'; fi)
-
 PARAMS=$(jq -nc --arg b64 "$DEPLOY_B64" '{ commands: ["echo " + $b64 + " | base64 -d | bash"] }')
 
-CMD_ID=$(aws ssm send-command \
-  --document-name "AWS-RunShellScript" \
-  --instance-ids $INSTANCE_IDS \
-  --parameters "$PARAMS" \
-  --query Command.CommandId \
-  --output text)
-
-echo "SSM command: $CMD_ID"
-
-FAIL=0
+# One box at a time so the ALB can keep serving the other.
 for id in $INSTANCE_IDS; do
+  echo "Deploying to $id ..."
+  CMD_ID=$(aws ssm send-command \
+    --document-name "AWS-RunShellScript" \
+    --instance-ids "$id" \
+    --parameters "$PARAMS" \
+    --query Command.CommandId \
+    --output text)
   aws ssm wait command-executed --command-id "$CMD_ID" --instance-id "$id" || true
   STATUS=$(aws ssm get-command-invocation \
     --command-id "$CMD_ID" \
@@ -94,11 +89,11 @@ for id in $INSTANCE_IDS; do
   echo "$id => $STATUS"
   if [[ "$STATUS" != "Success" ]]; then
     aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$id" --query StandardErrorContent --output text || true
-    FAIL=1
+    exit 1
   fi
+  # Brief pause so the updated target can pass ALB health before the next box.
+  sleep 20
 done
-
-[[ "$FAIL" -eq 0 ]] || exit 1
 
 aws ssm put-parameter \
   --name "/uncooked/app/image_tag" \
@@ -106,4 +101,4 @@ aws ssm put-parameter \
   --value "$IMAGE_TAG" \
   --overwrite >/dev/null
 
-echo "Deployed $IMAGE_TAG"
+echo "Deployed $IMAGE_TAG (rolling)"

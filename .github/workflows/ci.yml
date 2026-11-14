@@ -90,6 +90,12 @@ jobs:
         with:
           dockerfile: web/agent/Dockerfile
           failure-threshold: warning
+      - name: ShellCheck CD scripts
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: web/scripts/cd
+          severity: warning
+          ignore_paths: web/scripts/cd/ssm-bootstrap-hosts.ps1
 
   unit-tests:
     name: 06 Unit tests and coverage

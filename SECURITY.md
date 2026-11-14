@@ -18,6 +18,7 @@ Don't turn scanners off. If something stays, list it under accepted findings.
 |------|----------|-----|-------|--------|
 | xlsx (removed) | High | Switched to exceljs | Group | 2026-12 |
 | exceljs → uuid | Moderate | No clean fix yet; under Snyk high bar | Group | 2026-12 |
+| Ansible `mode` / Dockerfile.dev | Sonar MEDIUM | Infra/dev-only; excluded from Sonar sources (not runtime images) | Group | 2026-11 |
 
 ## Secrets
 
