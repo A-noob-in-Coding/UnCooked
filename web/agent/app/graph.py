@@ -183,7 +183,7 @@ def node_need_difficulty_gate(state: AgentState) -> AgentState:
     if uncertain:
         lines = [
             "I fetched your registered courses and auto-tagged most of them.",
-            "I am unsure about these — please reply with easy / medium / hard for each:\n",
+            "I am unsure about these - please reply with easy / medium / hard for each:\n",
         ]
         questions = []
         for u in uncertain:
@@ -356,7 +356,7 @@ def node_handle_accept_reject(state: AgentState) -> AgentState:
             **state,
             "phase": "apply",
             "awaiting_user": False,
-            "reply": "Great — apply this plan to lock your date sheet.",
+            "reply": "Great - apply this plan to lock your date sheet.",
         }
     if action == "reject" or re.search(r"\b(reject|no|change|different)\b", msg):
         prefs = _extract_prefs_from_text(state.get("user_message") or "", state.get("preferences") or [])
@@ -369,7 +369,7 @@ def node_handle_accept_reject(state: AgentState) -> AgentState:
             "proposed_selections": None,
             "proposed_rows": None,
         }
-    # unclear — stay on plan
+    # unclear - stay on plan
     return {
         **state,
         "phase": "show_plan",
@@ -483,7 +483,7 @@ def run_turn(
         return _response(state)
 
     if phase == "apply":
-        state["reply"] = "Plan is ready — use Apply on the UI to save your date sheet."
+        state["reply"] = "Plan is ready - use Apply on the UI to save your date sheet."
         state["awaiting_user"] = True
         _persist(state)
         return _response(state)

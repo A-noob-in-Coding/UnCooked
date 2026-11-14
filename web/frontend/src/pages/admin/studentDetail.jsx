@@ -159,23 +159,23 @@ const AdminStudentDetail = () => {
             <dl className="space-y-2 text-sm">
               <div>
                 <dt className="text-notion-muted text-xs">Phone</dt>
-                <dd>{student.phone || '—'}</dd>
+                <dd>{student.phone || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">CNIC</dt>
-                <dd>{student.cnic || '—'}</dd>
+                <dd>{student.cnic || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">DOB</dt>
-                <dd>{student.dob ? new Date(student.dob).toLocaleDateString() : '—'}</dd>
+                <dd>{student.dob ? new Date(student.dob).toLocaleDateString() : '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Gender</dt>
-                <dd>{student.gender || '—'}</dd>
+                <dd>{student.gender || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Address</dt>
-                <dd>{student.address || '—'}</dd>
+                <dd>{student.address || '-'}</dd>
               </div>
             </dl>
           </div>
@@ -186,23 +186,23 @@ const AdminStudentDetail = () => {
             <dl className="space-y-2 text-sm">
               <div>
                 <dt className="text-notion-muted text-xs">Father&apos;s Name</dt>
-                <dd>{student.fatherName || '—'}</dd>
+                <dd>{student.fatherName || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Parent CNIC</dt>
-                <dd>{student.parentCnic || '—'}</dd>
+                <dd>{student.parentCnic || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Occupation</dt>
-                <dd>{student.parentOccupation || '—'}</dd>
+                <dd>{student.parentOccupation || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Contact</dt>
-                <dd>{student.parentContact || '—'}</dd>
+                <dd>{student.parentContact || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Emergency</dt>
-                <dd>{student.emergencyContact || '—'}</dd>
+                <dd>{student.emergencyContact || '-'}</dd>
               </div>
             </dl>
           </div>
@@ -213,19 +213,19 @@ const AdminStudentDetail = () => {
             <dl className="space-y-2 text-sm">
               <div>
                 <dt className="text-notion-muted text-xs">Program</dt>
-                <dd>{student.program || '—'}</dd>
+                <dd>{student.program || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Semester</dt>
-                <dd>{student.semester || '—'}</dd>
+                <dd>{student.semester || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Session</dt>
-                <dd>{student.session || '—'}</dd>
+                <dd>{student.session || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Branch</dt>
-                <dd>{student.branch?.name || '—'}</dd>
+                <dd>{student.branch?.name || '-'}</dd>
               </div>
               <div>
                 <dt className="text-notion-muted text-xs">Date Sheet</dt>
@@ -288,7 +288,7 @@ const AdminStudentDetail = () => {
                   .filter((c) => !assignedIds.includes(String(c.id || c._id)))
                   .map((c) => (
                     <option key={c.id || c._id} value={c.id || c._id}>
-                      {c.courseCode} — {c.title}
+                      {c.courseCode} - {c.title}
                     </option>
                   ))}
               </select>

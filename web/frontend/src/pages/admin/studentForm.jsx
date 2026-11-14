@@ -181,7 +181,7 @@ const AdminStudentForm = () => {
       }));
       if (fields.fatherName) setParent((p) => ({ ...p, fatherName: fields.fatherName }));
       setTab('personal');
-      say({ title: 'Done', body: 'CNIC fields autofilled — review before saving', action: 'OK' });
+      say({ title: 'Done', body: 'CNIC fields autofilled - review before saving', action: 'OK' });
     } catch (err) {
       warn(err.response?.data?.message || 'CNIC OCR failed');
     } finally {
@@ -207,7 +207,7 @@ const AdminStudentForm = () => {
       setTab('parent');
       say({
         title: 'Done',
-        body: 'Parent CNIC fields autofilled — review before saving',
+        body: 'Parent CNIC fields autofilled - review before saving',
         action: 'OK',
       });
     } catch (err) {
@@ -294,7 +294,7 @@ const AdminStudentForm = () => {
 
           <form
             onSubmit={(e) => {
-              // Never auto-submit on Enter when changing steps — that was
+              // Never auto-submit on Enter when changing steps - that was
               // firing "Registration number required" as soon as Academic opened.
               e.preventDefault();
               if (!isLast) goNext();

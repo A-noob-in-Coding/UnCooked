@@ -4,7 +4,7 @@ const SemesterInput = ({
   value,
   onChange,
   className = 'n-input',
-  placeholder = '1–16',
+  placeholder = '1-16',
   disabled = false,
   id,
   name,

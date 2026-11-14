@@ -274,7 +274,7 @@ const createStudent = async (req, res) => {
     const regClash = await User.findOne({ registrationNumber: String(registrationNumber).trim() });
     if (regClash) return res.status(400).json({ message: 'Registration number already exists' });
 
-    // Same as CSV import: hold a pending password for "Send passwords" — no setup-email / temp login.
+    // Same as CSV import: hold a pending password for "Send passwords" - no setup-email / temp login.
     const plain = importService.issueStudentPassword();
     const student = await User.create({
       email, fullName, phone, cnic, dob, gender, address,

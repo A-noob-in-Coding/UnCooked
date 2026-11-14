@@ -35,7 +35,7 @@ const smoothPath = (points) => {
 const fmtDate = (d) =>
   d
     ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    : '—';
+    : '-';
 
 const typeLabel = (type) => {
   if (type === 'CHANGE_BRANCH') return 'Change branch';

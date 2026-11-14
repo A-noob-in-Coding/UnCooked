@@ -75,7 +75,7 @@ const AdminRequests = () => {
   const fmtDate = (d) =>
     d
       ? new Date(d).toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' })
-      : '—';
+      : '-';
 
   return (
     <div className="n-page">
@@ -138,8 +138,8 @@ const AdminRequests = () => {
                       key={r.id || r._id}
                       className="hover:bg-notion-surface/50 transition-colors"
                     >
-                      <td className="n-td font-medium">{r.student?.fullName || '—'}</td>
-                      <td className="n-td">{r.student?.registrationNumber || '—'}</td>
+                      <td className="n-td font-medium">{r.student?.fullName || '-'}</td>
+                      <td className="n-td">{r.student?.registrationNumber || '-'}</td>
                       <td className="n-td">
                         <span className="n-tag bg-notion-surface text-notion-text">
                           {r.type?.replace('_', ' ')}

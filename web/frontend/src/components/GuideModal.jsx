@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 /**
- * GuideModal — speech-bubble notification system (ported from no-cap).
+ * GuideModal - speech-bubble notification system (ported from no-cap).
  *
  * Usage:
  *   import { useGuide, useWarn } from '../components/GuideModal';

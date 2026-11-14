@@ -1,0 +1,14 @@
+# cp terraform.tfvars.example terraform.tfvars
+
+aws_region    = "ap-south-1"
+project_name  = "uncooked"
+instance_type = "m7i-flex.large"
+
+asg_min     = 2
+asg_desired = 2
+asg_max     = 4
+
+github_org  = "m-ahmad-butt"
+github_repo = "UnCooked"
+
+alarm_email = ""

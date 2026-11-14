@@ -92,7 +92,7 @@ const AdminSlotForm = () => {
               <option value="">Select course…</option>
               {courses.map((c) => (
                 <option key={c.id || c._id} value={c.id || c._id}>
-                  {c.courseCode} — {c.title}
+                  {c.courseCode} - {c.title}
                 </option>
               ))}
             </select>

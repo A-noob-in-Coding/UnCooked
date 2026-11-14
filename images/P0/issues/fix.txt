@@ -27,7 +27,7 @@ Fix:
   Keep CI analysis via job 07 (sonarqube-scan-action + SONAR_TOKEN).
 
 Commit:
-  (UI only — no repo change)
+  (UI only - no repo change)
 
 3) Snyk: job 08 failed (missing node_modules)
 Issue:
@@ -47,10 +47,10 @@ Screenshot:
 4) Snyk: job 08 failed (High/Critical vulns)
 Issue:
   Backend scan found High/Critical deps, e.g.:
-  - qs@6.14.x (HIGH) via express/body-parser — fix >= 6.16.1
-  - proxy-addr@2.0.7 (CRITICAL) via express — fix >= 2.0.8
-  - xlsx@0.18.5 (HIGH) — ReDoS / prototype pollution — no upstream fix
-  - nodemailer older builds (HIGH) — upgrade available
+  - qs@6.14.x (HIGH) via express/body-parser - fix >= 6.16.1
+  - proxy-addr@2.0.7 (CRITICAL) via express - fix >= 2.0.8
+  - xlsx@0.18.5 (HIGH) - ReDoS / prototype pollution - no upstream fix
+  - nodemailer older builds (HIGH) - upgrade available
 
   Summary at fail time: ~5 Critical, ~41 High (open).
 
@@ -78,7 +78,7 @@ Screenshot:
   images/P0/issues/ (Snyk High/Critical summary run)
 
 
-5) Snyk — job 08 failed again (multer Critical)
+5) Snyk - job 08 failed again (multer Critical)
 Issue:
   SNYK-JS-MULTER-10299878 Uncaught Exception [CRITICAL] in multer@1.4.5-lts.2
   Plus more High findings tied to multer 1.x (empty field name crash / DoS).
@@ -88,7 +88,7 @@ Fix:
   Upgrade multer 1.4.5-lts.2 → 2.5.0 (API still memoryStorage + fileFilter;
   admin.routes.js unchanged).
 
-Commit message (local — push yourself):
+Commit message (local - push yourself):
   fix(deps): upgrade multer to 2.5.0 for Snyk critical
 
 Files:
@@ -96,7 +96,7 @@ Files:
   web/backend/package-lock.json
 
 
-6) Snyk — job 08 failed (ioredis High)
+6) Snyk - job 08 failed (ioredis High)
 Issue:
   SNYK-JS-IOREDIS-19963957 Uncontrolled Recursion [HIGH] in ioredis@5.10.1
   Introduced by hackathon-backend-monolith > ioredis@5.10.1
@@ -129,14 +129,14 @@ Fix:
   - sonar.cpd.exclusions for frontend pages (CRUD similarity)
   - unit tests for import helpers (exceljs migration new code)
   - terraform: associate_public_ip_address = false (Sonar security)
-  - (QG wait on every branch broke free tier — see issue 8)
+  - (QG wait on every branch broke free tier - see issue 8)
 
 Commit message (push yourself):
   fix(sonar): meet new-code quality gate coverage and security
 
 If Reliability/Security still C after push:
   SonarCloud → Issues → New Code → fix remaining bugs/vulns
-  (or Accept with reason + SECURITY.md — gate needs ratings A)
+  (or Accept with reason + SECURITY.md - gate needs ratings A)
 
 ----------------------------------------
 8) SonarCloud job 07 failed (QG wait on non-main)
@@ -155,7 +155,7 @@ Fix:
 Commit message (push yourself):
   fix(sonar): wait for quality gate only on main
 
-9) Snyk frontend — 1 High (vite)
+9) Snyk frontend - 1 High (vite)
 Issue:
   Job 08 failed on frontend: 1 HIGH (vite path-traversal / related).
   vite was on 5.4.x (devDependency but still reported).
@@ -181,7 +181,7 @@ Commit message (push yourself):
   fix(ci): clear frontend Snyk high and Sonar new-code gate
 
 
-11) Snyk frontend — Open Redirect High (react-router)
+11) Snyk frontend - Open Redirect High (react-router)
 Issue:
   SNYK-JS-REACTROUTER-18313144 Open Redirect [HIGH] in react-router@6.30.6
   via react-router-dom@6.30.6. No fix on v6; need >= 7.18.0.
@@ -193,7 +193,7 @@ Commit message (push yourself):
   fix(deps): upgrade react-router-dom to 7.18.5 for Snyk high
 
 
-12) Trivy job 10 — invalid action version
+12) Trivy job 10 - invalid action version
 Issue:
   Unable to resolve action 'aquasecurity/trivy-action@0.28.0'
   Tag 0.28.0 does not exist (Aqua moved to v-prefixed tags).
@@ -205,7 +205,7 @@ Commit message (push yourself):
   fix(ci): pin Trivy action to v0.36.0
 
 
-13) Trivy job 10 — Alpine/OS High+Critical in images
+13) Trivy job 10 - Alpine/OS High+Critical in images
 Issue:
   Frontend image (nginx alpine 3.21) reported 68 vulns
   (HIGH 65, CRITICAL 3) in OS libs (openssl, zlib, curl, …).
@@ -221,7 +221,7 @@ Fix:
 Commit message (push yourself):
   fix(docker): upgrade bases and apk/apt packages for Trivy
 
-14) Trivy frontend — nginx 1.28.2 package CVEs
+14) Trivy frontend - nginx 1.28.2 package CVEs
 Issue:
   After alpine upgrade, 10 nginx vulns remained (1 Critical, 9 High).
   Installed nginx 1.28.2-r1; fixes require 1.28.3-r0 … 1.28.3-r6.
@@ -234,11 +234,11 @@ Commit message (push yourself):
   fix(docker): use nginx-unprivileged 1.31.7-alpine (valid Hub tag)
 
 
-15) Trivy backend — HIGH in image-bundled npm
+15) Trivy backend - HIGH in image-bundled npm
 Issue:
   Trivy found HIGH in node:22-alpine bundled npm tree
   (brace-expansion, pacote, picomatch, sigstore, ip-address)
-  under usr/local/lib/node_modules/npm — not app dependencies.
+  under usr/local/lib/node_modules/npm - not app dependencies.
   Fixes exist but live inside Node image's npm CLI.
 
 Fix:
@@ -253,7 +253,7 @@ Accepted (not fail-threshold): see SECURITY.md
   exceljs -> uuid     Moderate  no non-breaking fix
 
 
-16) Trivy agent — Python HIGH/CRITICAL (LangChain/Starlette)
+16) Trivy agent - Python HIGH/CRITICAL (LangChain/Starlette)
 Issue:
   Agent image: Total 11 (HIGH 10, CRITICAL 1).
   langchain-core 0.3.28 → CVE-2025-68664 (Critical) + 3 High
@@ -277,8 +277,8 @@ Commit message (push yourself):
 17) "SonarCloud Code Analysis" red while ci/07 green
 Issue:
   Checks: 9 successful, 1 failing.
-  All workflow jobs 02–10 passed (incl. Trivy).
-  Only "SonarCloud Code Analysis" failed — Quality Gate failed.
+  All workflow jobs 02-10 passed (incl. Trivy).
+  Only "SonarCloud Code Analysis" failed - Quality Gate failed.
   That check is the SonarCloud GitHub App decoration, not job 07.
   Job 07 uploads the scan with qualitygate.wait=false off-main
   (free tier), so the Actions job stays green even when QG fails.
@@ -292,7 +292,7 @@ Fix (no ci.yml change needed):
      until gate is Passed (same class of work as issues 7 + 10).
   3. Branch ruleset: require `ci / 07 Static analysis (SonarCloud)`,
      NOT `SonarCloud Code Analysis`, unless you want App QG to block.
-     Phase 01 evidence = workflow jobs 02–10.
+     Phase 01 evidence = workflow jobs 02-10.
 
 If you paste the Sonar New Code failures, we can patch code next.
 
@@ -303,7 +303,7 @@ Issue:
   - Coverage on New Code 40.1% (need ≥ 80%)
   - Reliability Rating on New Code C (need A)
   - Security Rating on New Code C (need A)
-  Root cause: SonarCloud WARN —
+  Root cause: SonarCloud WARN -
   "sonar.sources, sonar.tests … have no effect: the new analysis
   scope UX analyzes the whole project by default".
   So frontend/agent/terraform (0.0.0.0/0 SG, untested UI) all counted

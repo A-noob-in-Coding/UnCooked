@@ -1,0 +1,80 @@
+---
+- name: Deploy app stack
+  hosts: app
+  become: true
+  vars:
+    deploy_dir: /opt/uncooked
+    aws_region: ap-south-1
+  roles:
+    - docker
+  tasks:
+    - name: Require data_host and image tag
+      ansible.builtin.assert:
+        that:
+          - data_host is defined
+          - ecr_registry is defined
+          - image_tag is defined
+
+    - name: Create deploy directory
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Login to ECR
+      ansible.builtin.shell: |
+        set -euo pipefail
+        aws ecr get-login-password --region {{ aws_region }} \
+          | docker login --username AWS --password-stdin {{ ecr_registry }}
+      args:
+        executable: /bin/bash
+
+    - name: Copy app compose file
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../web/docker-compose.app.yml"
+        dest: "{{ deploy_dir }}/docker-compose.app.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Write runtime env for compose
+      ansible.builtin.copy:
+        dest: "{{ deploy_dir }}/.env"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0600"
+        content: |
+          DATA_HOST={{ data_host }}
+          ECR_FRONTEND_IMAGE={{ ecr_registry }}/uncooked-frontend:{{ image_tag }}
+          ECR_BACKEND_IMAGE={{ ecr_registry }}/uncooked-backend:{{ image_tag }}
+          ECR_AGENT_IMAGE={{ ecr_registry }}/uncooked-agent:{{ image_tag }}
+          REDIS_PASSWORD=123123123
+          RABBITMQ_USER=admin123
+          RABBITMQ_PASSWORD=123123123
+          RABBITMQ_VHOST=hackathon
+
+    - name: Ensure app env directories
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - backend
+        - agent
+
+    - name: Ensure env_file placeholders exist
+      ansible.builtin.copy:
+        dest: "{{ deploy_dir }}/{{ item }}"
+        content: ""
+        force: false
+        mode: "0600"
+      loop:
+        - backend/.env
+        - agent/.env
+
+    - name: Pull and start app services
+      ansible.builtin.command:
+        cmd: docker compose -f docker-compose.app.yml --env-file .env up -d --pull always
+        chdir: "{{ deploy_dir }}"

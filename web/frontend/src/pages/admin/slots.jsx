@@ -72,7 +72,7 @@ const AdminSlots = () => {
           month: 'short',
           day: 'numeric',
         })
-      : '—';
+      : '-';
 
   return (
     <div className="n-page">
@@ -103,7 +103,7 @@ const AdminSlots = () => {
             <option value="">All Courses</option>
             {courses.map((c) => (
               <option key={c.id || c._id} value={c.id || c._id}>
-                {c.courseCode} — {c.title}
+                {c.courseCode} - {c.title}
               </option>
             ))}
           </select>
@@ -139,8 +139,8 @@ const AdminSlots = () => {
                       className="hover:bg-notion-surface/50 transition-colors"
                     >
                       <td className="n-td font-medium">
-                        {s.course?.courseCode || '—'}{' '}
-                        <span className="text-notion-muted font-normal">— {s.course?.title}</span>
+                        {s.course?.courseCode || '-'}{' '}
+                        <span className="text-notion-muted font-normal">- {s.course?.title}</span>
                       </td>
                       <td className="n-td">{fmtDate(s.date)}</td>
                       <td className="n-td">{s.startTime}</td>
@@ -172,10 +172,10 @@ const AdminSlots = () => {
               {slots.map((s) => (
                 <div key={s.id || s._id} className="n-card p-4">
                   <div className="mb-1 font-semibold text-sm">
-                    {s.course?.courseCode} — {s.course?.title}
+                    {s.course?.courseCode} - {s.course?.title}
                   </div>
                   <p className="text-xs text-notion-muted">
-                    {fmtDate(s.date)} · {s.startTime} – {s.endTime}
+                    {fmtDate(s.date)} · {s.startTime} - {s.endTime}
                   </p>
                   <p className="text-xs text-notion-muted">
                     Capacity: {s.capacity} · Booked: {s.booked || 0}

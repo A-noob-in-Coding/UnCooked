@@ -68,7 +68,7 @@ const StudentRequests = () => {
   const fmtDate = (d) =>
     d
       ? new Date(d).toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' })
-      : '—';
+      : '-';
 
   return (
     <div className="n-page">
