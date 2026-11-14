@@ -1,5 +1,0 @@
-# Local (hot reload, all services):
-docker compose --env-file frontend/.env --env-file backend/.env up --build
-
-# Production:
-docker compose -f docker-compose.prod.yml --env-file frontend/.env --env-file backend/.env up -d --build
