@@ -64,3 +64,18 @@ resource "aws_autoscaling_group" "app" {
     propagate_at_launch = true
   }
 }
+
+# Target tracking on ALB request count (scale-out under load, scale-in after).
+resource "aws_autoscaling_policy" "app_request_count" {
+  name                   = "${local.name_asg}-req-count"
+  autoscaling_group_name = aws_autoscaling_group.app.name
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label         = "${aws_lb.app.arn_suffix}/${aws_lb_target_group.app.arn_suffix}"
+    }
+    target_value = 100.0
+  }
+}

@@ -13,6 +13,11 @@ on:
         options:
           - deploy
           - rollback
+      image_tag:
+        description: Image tag for manual rollback (git SHA). Leave empty to use previous SSM tag.
+        required: false
+        type: string
+        default: ""
 
 permissions:
   id-token: write
@@ -45,36 +50,55 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Image tag
+      - name: Image tags (git SHA + semver)
         id: meta
-        run: echo "tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+        run: |
+          SHA="${GITHUB_SHA}"
+          BASE="$(tr -d '[:space:]' < VERSION || echo 1.0.0)"
+          SEMVER="v${BASE}.${GITHUB_RUN_NUMBER}"
+          echo "tag=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "semver=${SEMVER}" >> "$GITHUB_OUTPUT"
+          echo "SHA=${SHA} SEMVER=${SEMVER}"
 
       - name: Build and push frontend
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           TAG: ${{ steps.meta.outputs.tag }}
+          SEMVER: ${{ steps.meta.outputs.semver }}
         run: |
           docker build \
             --build-arg VITE_API_URL= \
             -t "$REGISTRY/uncooked-frontend:$TAG" \
+            -t "$REGISTRY/uncooked-frontend:$SEMVER" \
             ./web/frontend
           docker push "$REGISTRY/uncooked-frontend:$TAG"
+          docker push "$REGISTRY/uncooked-frontend:$SEMVER"
 
       - name: Build and push backend
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           TAG: ${{ steps.meta.outputs.tag }}
+          SEMVER: ${{ steps.meta.outputs.semver }}
         run: |
-          docker build -t "$REGISTRY/uncooked-backend:$TAG" ./web/backend
+          docker build \
+            -t "$REGISTRY/uncooked-backend:$TAG" \
+            -t "$REGISTRY/uncooked-backend:$SEMVER" \
+            ./web/backend
           docker push "$REGISTRY/uncooked-backend:$TAG"
+          docker push "$REGISTRY/uncooked-backend:$SEMVER"
 
       - name: Build and push agent
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           TAG: ${{ steps.meta.outputs.tag }}
+          SEMVER: ${{ steps.meta.outputs.semver }}
         run: |
-          docker build -t "$REGISTRY/uncooked-agent:$TAG" ./web/agent
+          docker build \
+            -t "$REGISTRY/uncooked-agent:$TAG" \
+            -t "$REGISTRY/uncooked-agent:$SEMVER" \
+            ./web/agent
           docker push "$REGISTRY/uncooked-agent:$TAG"
+          docker push "$REGISTRY/uncooked-agent:$SEMVER"
 
   deploy:
     name: 12 Deploy and smoke
@@ -130,4 +154,5 @@ jobs:
           ASG_NAME: ${{ vars.ASG_NAME }}
           DATA_HOST: ${{ vars.DATA_HOST }}
           ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
         run: bash web/scripts/cd/rollback.sh
