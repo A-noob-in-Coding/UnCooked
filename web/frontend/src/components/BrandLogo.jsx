@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Brand mark only — logo image, no text.
+ * Brand mark only - logo image, no text.
  */
 const BrandLogo = ({ to = '/', className = '', imgClassName = 'h-8 w-auto' }) => {
   const img = (

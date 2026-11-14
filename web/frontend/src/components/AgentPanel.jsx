@@ -20,7 +20,7 @@ const PREF_CHIPS = [
   { id: 'min_gap', label: 'Min gap' },
   { id: 'max_gap', label: 'Max gap / rest' },
   { id: 'hardest_first', label: 'Hardest first' },
-  { id: 'alternate_difficulty', label: 'Hard–easy alternate' },
+  { id: 'alternate_difficulty', label: 'Hard-easy alternate' },
   { id: 'hard_more_gap', label: 'More gap for hard' },
   { id: 'fewer_visits', label: 'Fewer campus visits' },
 ];
@@ -286,14 +286,14 @@ const AgentPanel = ({ open, onClose }) => {
                           {r.courseCode || r.courseId}
                         </td>
                         <td className="py-1.5 pr-2 capitalize text-[#787774]">
-                          {r.difficulty || '—'}
+                          {r.difficulty || '-'}
                         </td>
                         <td className="py-1.5 pr-2 text-[#37352f]">
                           {(r.date || '').slice(0, 10)}
                         </td>
                         <td className="py-1.5 text-[#37352f]">
                           {r.startTime}
-                          {r.endTime ? `–${r.endTime}` : ''}
+                          {r.endTime ? `-${r.endTime}` : ''}
                         </td>
                       </tr>
                     ))}

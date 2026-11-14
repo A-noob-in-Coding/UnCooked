@@ -101,7 +101,7 @@ const seedCourses = async () => {
 const seedStudents = async () => {
   const hashed = await bcrypt.hash('demo', 10);
 
-  // Do NOT remap onto the admin email — that demotes ADMIN on every seed.
+  // Do NOT remap onto the admin email - that demotes ADMIN on every seed.
   const rename = [
     ['student2@examslot.com', 'payment.io.social@gmail.com'],
   ];

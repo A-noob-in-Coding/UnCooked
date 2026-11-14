@@ -99,7 +99,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-notion-text">
-      {/* Form side — centered */}
+      {/* Form side - centered */}
       <div className="flex w-full flex-col px-6 py-8 lg:w-[48%] lg:px-20">
         <Link
           to="/"
@@ -174,7 +174,7 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Side panel — exact no-cap AuthSidePanel layout */}
+      {/* Side panel - exact no-cap AuthSidePanel layout */}
       <div className="relative hidden overflow-hidden border-l border-notion-border bg-notion-surface lg:flex lg:w-[52%] lg:items-center lg:justify-center">
         <div className="relative z-10 w-full max-w-xl px-14">
           <span className="n-chip mb-6">Virtual University Exam System</span>

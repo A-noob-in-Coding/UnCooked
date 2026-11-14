@@ -181,7 +181,7 @@ const commitBranches = async (rows) => {
         {
           name: row.name,
           code: row.code,
-          city: row.city || '—',
+          city: row.city || '-',
           address: row.address,
           contactNumber: row.contactNumber,
           status: row.status,

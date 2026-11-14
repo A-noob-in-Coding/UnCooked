@@ -83,7 +83,7 @@ const PORT = process.env.PORT || 3001;
   try {
     await connectMongo();
 
-    // RabbitMQ is optional — don't crash if unavailable
+    // RabbitMQ is optional - don't crash if unavailable
     try {
       const { connectRabbitMQ } = require('./config/rabbitmq');
       await connectRabbitMQ();

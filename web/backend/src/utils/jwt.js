@@ -41,7 +41,7 @@ if (!privatePem || !publicPem) {
   );
 }
 
-// KeyObjects — public key cannot be misused as an HMAC secret (alg confusion).
+// KeyObjects - public key cannot be misused as an HMAC secret (alg confusion).
 const privateKey = crypto.createPrivateKey(privatePem);
 const publicKey = crypto.createPublicKey(publicPem);
 
