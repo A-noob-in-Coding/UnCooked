@@ -1,0 +1,40 @@
+# App ASG node. DATA_HOST = data EC2 private IP.
+services:
+  agent:
+    image: ${ECR_AGENT_IMAGE}
+    environment:
+      REDIS_URL: redis://:${REDIS_PASSWORD:-123123123}@${DATA_HOST}:6379
+    env_file:
+      - ./agent/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  backend:
+    image: ${ECR_BACKEND_IMAGE}
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      AGENT_URL: http://agent:8002
+      MONGO_URI: mongodb://${DATA_HOST}:27017/authdb
+      REDIS_URL: redis://:${REDIS_PASSWORD:-123123123}@${DATA_HOST}:6379
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin123}:${RABBITMQ_PASSWORD:-123123123}@${DATA_HOST}:5672/${RABBITMQ_VHOST:-hackathon}
+    depends_on:
+      agent:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: ${ECR_FRONTEND_IMAGE}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped

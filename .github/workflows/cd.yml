@@ -1,0 +1,133 @@
+name: cd
+
+# Push images + deploy on main. Needs AWS_ROLE_ARN secret and the CD vars.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: CD action
+        type: choice
+        default: deploy
+        options:
+          - deploy
+          - rollback
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: cd-main
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
+
+jobs:
+  ecr-push:
+    name: 11 Push images to ECR
+    if: github.event_name == 'push' || inputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Image tag
+        id: meta
+        run: echo "tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push frontend
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          docker build \
+            --build-arg VITE_API_URL= \
+            -t "$REGISTRY/uncooked-frontend:$TAG" \
+            ./web/frontend
+          docker push "$REGISTRY/uncooked-frontend:$TAG"
+
+      - name: Build and push backend
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          docker build -t "$REGISTRY/uncooked-backend:$TAG" ./web/backend
+          docker push "$REGISTRY/uncooked-backend:$TAG"
+
+      - name: Build and push agent
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          docker build -t "$REGISTRY/uncooked-agent:$TAG" ./web/agent
+          docker push "$REGISTRY/uncooked-agent:$TAG"
+
+  deploy:
+    name: 12 Deploy and smoke
+    needs: ecr-push
+    if: github.event_name == 'push' || inputs.action == 'deploy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy app tag via SSM
+        env:
+          IMAGE_TAG: ${{ needs.ecr-push.outputs.image_tag }}
+          ASG_NAME: ${{ vars.ASG_NAME }}
+          DATA_HOST: ${{ vars.DATA_HOST }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+        run: bash web/scripts/cd/deploy.sh
+
+      - name: Smoke test ALB
+        env:
+          ALB_URL: ${{ vars.ALB_URL }}
+        run: bash web/scripts/cd/smoke.sh
+
+      - name: Auto-rollback on smoke failure
+        if: failure()
+        env:
+          ASG_NAME: ${{ vars.ASG_NAME }}
+          DATA_HOST: ${{ vars.DATA_HOST }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+          PREVIOUS_TAG_FILE: /tmp/uncooked-previous-tag
+        run: bash web/scripts/cd/rollback.sh
+
+  rollback:
+    name: 12 Manual rollback
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'rollback'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Rollback to previous tag
+        env:
+          ASG_NAME: ${{ vars.ASG_NAME }}
+          DATA_HOST: ${{ vars.DATA_HOST }}
+          ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+        run: bash web/scripts/cd/rollback.sh

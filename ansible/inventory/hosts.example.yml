@@ -1,0 +1,24 @@
+# cp hosts.example.yml hosts.yml  (hosts.yml is gitignored)
+# Use instance IDs + aws_ssm - no SSH keys needed.
+all:
+  children:
+    data:
+      hosts:
+        data1:
+          ansible_host: i-xxxxxxxxxxxxxxxxx
+          ansible_connection: aws_ssm
+          ansible_aws_ssm_region: ap-south-1
+    app:
+      hosts:
+        app1:
+          ansible_host: i-yyyyyyyyyyyyyyyyy
+          ansible_connection: aws_ssm
+          ansible_aws_ssm_region: ap-south-1
+        app2:
+          ansible_host: i-zzzzzzzzzzzzzzzzz
+          ansible_connection: aws_ssm
+          ansible_aws_ssm_region: ap-south-1
+  vars:
+    project_name: uncooked
+    aws_region: ap-south-1
+    deploy_dir: /opt/uncooked
