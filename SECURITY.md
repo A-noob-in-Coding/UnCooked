@@ -1,41 +1,34 @@
 # Security
 
-## Pipeline scanners
+## Scanners
 
-Stages that must fail the build on high/critical findings:
+| Stage | Tool | Fails when |
+|-------|------|------------|
+| 02 | Gitleaks | Secret in history |
+| 07 | SonarCloud | Quality gate fails |
+| 08 | Snyk | High/critical dep |
+| 10 | Trivy | High/critical image (fixed only) |
+| 11-12 | CD | Smoke fails (then rollback) |
 
-| Stage | Tool | Fail condition |
-|-------|------|----------------|
-| 02 | Gitleaks | Any secret in full git history |
-| 07 | SonarCloud | Quality gate failed |
-| 08 | Snyk | High/critical dependency vuln |
-| 10 | Trivy | High/critical image vuln (unfixed ignored) |
+Don't turn scanners off. If something stays, list it under accepted findings.
 
-Do not disable scanners or lower thresholds. Fix findings, or document accepted risk below with owner and reason.
+## Accepted
 
-## Accepted findings
-
-| ID / package | Severity | Reason | Owner | Review by |
-|--------------|----------|--------|-------|-----------|
-| `xlsx` (removed) | High | Replaced with `exceljs` — community `xlsx` has no fixed release | Group | 2026-12 |
-| `exceljs` → `uuid` | Moderate | No non-breaking fix; admin Excel import only; below Snyk fail threshold | Group | 2026-12 |
+| Item | Severity | Why | Owner | Review |
+|------|----------|-----|-------|--------|
+| xlsx (removed) | High | Switched to exceljs | Group | 2026-12 |
+| exceljs → uuid | Moderate | No clean fix yet; under Snyk high bar | Group | 2026-12 |
 
 ## Secrets
 
-Keep credentials out of the repo. Use GitHub Secrets / OIDC / AWS SSM or Secrets Manager.
+CI: `SONAR_TOKEN`, `SNYK_TOKEN`
 
-Required for CI (stages 1–10):
+CD: no long-lived AWS keys. Use OIDC.
 
-- `SONAR_TOKEN` — SonarCloud token
-- `SNYK_TOKEN` — Snyk API token
+- Secret: `AWS_ROLE_ARN`
+- Vars: `AWS_REGION`, `ALB_URL`, `ASG_NAME`, `DATA_HOST`, `ECR_REGISTRY`
+- JWT PEM keys: SSM `/uncooked/app/jwt_private_key` + `jwt_public_key` (not GitHub)
 
-Update `sonar-project.properties` (`sonar.organization`, `sonar.projectKey`) to match your SonarCloud project.
+## Branch protection
 
-## Branch protection (main)
-
-Settings → Branches → Protect `main`:
-
-1. Require a pull request before merging (1 reviewer)
-2. Require status checks to pass before merging — select every CI job (02–10)
-3. Do not allow bypassing for admins (course demo)
-4. Block direct pushes to `main`
+Protect `main`: require PR + the CI job names **02-10** (match the names Actions actually reports).

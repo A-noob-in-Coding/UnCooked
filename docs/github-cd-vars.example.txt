@@ -1,0 +1,14 @@
+# Repo → Settings → Secrets and variables → Actions
+# AWS_ROLE_ARN = secret; the rest = variables
+# Fill real values with: bash web/scripts/cd/print-github-vars.sh
+#
+# JWT keys are NOT GitHub secrets - they sit in SSM:
+#   /uncooked/app/jwt_private_key
+#   /uncooked/app/jwt_public_key
+
+AWS_ROLE_ARN=arn:aws:iam::ACCOUNT_ID:role/uncooked-github-actions
+AWS_REGION=ap-south-1
+ALB_URL=http://uncooked-alb-xxxx.ap-south-1.elb.amazonaws.com
+ASG_NAME=uncooked-app-asg
+DATA_HOST=10.20.0.x
+ECR_REGISTRY=ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com
