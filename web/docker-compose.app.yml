@@ -26,6 +26,7 @@ services:
       MONGO_URI: mongodb://${DATA_HOST}:27017/authdb
       REDIS_URL: redis://:${REDIS_PASSWORD:-123123123}@${DATA_HOST}:6379
       RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin123}:${RABBITMQ_PASSWORD:-123123123}@${DATA_HOST}:5672/${RABBITMQ_VHOST:-hackathon}
+      SERVER_IP: ${SERVER_IP:-unknown}
     depends_on:
       agent:
         condition: service_healthy

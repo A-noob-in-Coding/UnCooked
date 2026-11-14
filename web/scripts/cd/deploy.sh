@@ -52,11 +52,15 @@ mkdir -p /opt/uncooked/backend /opt/uncooked/agent
 cd /opt/uncooked
 printf '%s' '${COMPOSE_B64}' | base64 -d > docker-compose.app.yml
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+# Private IP of this EC2 (IMDSv2) - different per ASG box for the footer demo.
+TOKEN=\$(curl -fsS -X PUT 'http://169.254.169.254/latest/api/token' -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600' || true)
+SERVER_IP=\$(curl -fsS -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4 || hostname -I | awk '{print \$1}')
 printf '%s\n' \
   'DATA_HOST=${DATA_HOST}' \
   'ECR_FRONTEND_IMAGE=${ECR_REGISTRY}/uncooked-frontend:${IMAGE_TAG}' \
   'ECR_BACKEND_IMAGE=${ECR_REGISTRY}/uncooked-backend:${IMAGE_TAG}' \
   'ECR_AGENT_IMAGE=${ECR_REGISTRY}/uncooked-agent:${IMAGE_TAG}' \
+  "SERVER_IP=\${SERVER_IP}" \
   'REDIS_PASSWORD=123123123' \
   'RABBITMQ_USER=admin123' \
   'RABBITMQ_PASSWORD=123123123' \

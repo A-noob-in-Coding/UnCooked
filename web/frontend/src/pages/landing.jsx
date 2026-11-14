@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BrandLogo from '../components/BrandLogo';
 import {
@@ -490,9 +491,29 @@ function LandingDemo() {
   );
 }
 
-import { useState } from 'react';
-
 const LandingPage = () => {
+  const [serverIp, setServerIp] = useState('...');
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      fetch('/health')
+        .then((r) => r.json())
+        .then((d) => {
+          if (!cancelled) setServerIp(d.serverIp || d.hostname || 'unknown');
+        })
+        .catch(() => {
+          if (!cancelled) setServerIp('unreachable');
+        });
+    };
+    load();
+    const id = setInterval(load, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, []);
+
   return (
     <div className="n-page overflow-x-hidden bg-white">
       {/* Header */}
@@ -711,7 +732,12 @@ const LandingPage = () => {
           <span className="min-w-0 text-sm text-notion-muted">
             Built for Virtual University exam scheduling.
           </span>
-          <Link to="/login" className="n-btn-ghost text-sm sm:ml-auto">
+          <span className="min-w-0 break-all font-mono text-xs text-notion-muted sm:ml-auto">
+            ALB {typeof window !== 'undefined' ? window.location.host : ''}
+            {' | '}
+            server {serverIp}
+          </span>
+          <Link to="/login" className="n-btn-ghost text-sm">
             Sign in <ArrowRight size={15} />
           </Link>
         </div>

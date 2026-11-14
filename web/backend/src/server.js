@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const express = require('express');
@@ -48,6 +49,9 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     service: 'examslot-backend',
+    // Per-box identity for ALB / HA demos (set SERVER_IP at deploy).
+    serverIp: process.env.SERVER_IP || os.hostname(),
+    hostname: os.hostname(),
   });
 });
 
