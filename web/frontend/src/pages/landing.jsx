@@ -736,6 +736,8 @@ const LandingPage = () => {
             ALB {typeof window !== 'undefined' ? window.location.host : ''}
             {' | '}
             server {serverIp}
+            {' | '}
+            cd-probe v1
           </span>
           <Link to="/login" className="n-btn-ghost text-sm">
             Sign in <ArrowRight size={15} />
