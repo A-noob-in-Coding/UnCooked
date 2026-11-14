@@ -1,8 +1,9 @@
-# Terraform provider cache, state, and keys. Keep *.tf and .terraform.lock.hcl.
+# Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
 *.tfplan
+tfplan
 *.pem
 crash.log
 crash.*.log
@@ -14,10 +15,16 @@ override.tf.json
 *.tfvars.json
 !*.tfvars.example
 
+# Local / generated (account-specific)
+docs/github-cd-vars.txt
+ansible/inventory/hosts.yml
+web/agent/.venv-trivy/
+
 ssh.ps1
 ssh-stage.ps1
+ssh-p.ps1
 
-# Secrets. *.env.example stays tracked.
+# Secrets
 .env
 .env.*
 !.env.example
@@ -26,15 +33,17 @@ ssh-stage.ps1
 # Python
 __pycache__/
 *.py[cod]
+.venv/
+venv/
 
-# Node and build output
+# Node
 node_modules/
 dist/
 dist-ssr/
 build/
 coverage/
 
-# OS and editors
+# OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
