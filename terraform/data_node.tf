@@ -15,11 +15,12 @@ data "aws_ami" "ubuntu" {
 
 # Mongo / Redis / RabbitMQ live here.
 resource "aws_instance" "data" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.data.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2.name
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = var.instance_type
+  subnet_id                   = aws_subnet.private[0].id
+  vpc_security_group_ids      = [aws_security_group.data.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  associate_public_ip_address = false
 
   root_block_device {
     volume_size = 40

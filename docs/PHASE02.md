@@ -57,9 +57,15 @@ Push/merge to `main`, or run the `cd` workflow manually (`deploy` / `rollback`).
 
 Screenshots checklist: `images/P1/README.md`.
 
+## Network (brief)
+
+- Public subnets (2 AZ): ALB + NAT  
+- Private subnets (2 AZ): app ASG + data EC2  
+- CIDRs and SGs: `docs/architecture.md`
+
 ## Cost note
 
-Three `m7i-flex.large` instances add up fast (~$0.30/hr). Tear down when you are not demoing:
+Three `m7i-flex.large` instances + **NAT Gateway** add up fast. Set `budget_email` in `terraform.tfvars`. Tear down when you are not demoing:
 
 ```bash
 cd terraform && terraform destroy
